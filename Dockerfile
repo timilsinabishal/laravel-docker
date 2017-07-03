@@ -1,18 +1,17 @@
-FROM php:7-fpm-alpine
+FROM alpine:latest
 
-Maintainer Bishal Timilsina<bishaltimilsina@gmail.com>
+LABEL maintainer Bishal Timilsina<bishaltimilsina@gmail.com>
 
-RUN apk add openssl --update-cache
-
-RUN apk add postgresql-dev freetype-dev libpng-dev libjpeg-turbo-dev freetype libpng libjpeg-turbo \
-    && docker-php-ext-configure gd \
-    --with-gd \
-    --with-freetype-dir=/usr/include/ \
-    --with-png-dir=/usr/include/ \
-    --with-jpeg-dir=/usr/include/ \
- && docker-php-ext-install gd pdo pdo_pgsql mbstring zip
+RUN apk --update add curl php7 php7-openssl php7-curl php7-json php7-phar php7-mbstring php7-zip
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
-workdir /var/www
+RUN composer global require hirak/prestissimo
 
+RUN mkdir -p /var/www
+
+WORKDIR /var/www
+
+EXPOSE 9000
+
+ENTRYPOINT ["/usr/sbin/php-fpm7"]
